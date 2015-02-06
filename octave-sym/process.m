@@ -17,9 +17,12 @@ r = r(9.404e6:9.414e6);
 if(1)
 
 [D, f, corr, power, frame_start, d_f, sig_out, sig_out_corr] = schmidl_corr(r, 32);
-#plot(D,'r');
-#plot(f,'g');
-#title('Schmidl Cox out');
+figure;
+hold on;
+grid on;
+plot(D,'r');
+plot(f,'g');
+title('Schmidl Cox out');
 
 long_preamble_f = [1 1 -1 -1 1 1 -1 1 -1 1 1 1 1 1 1 -1 -1 1 1 -1 1 -1 1 1 1 1 0 1 -1 -1 1 1 -1 1 -1 1 -1 -1 -1 -1 -1 1 1 -1 -1 1 -1 1 -1 1 1 1 1];
 
