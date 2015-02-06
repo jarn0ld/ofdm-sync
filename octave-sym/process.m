@@ -78,7 +78,20 @@ plot(abs(H_ls));
 plot(arg(H_ls), 'r');
 title('Channel response H(f)');
 
+figure;
+plot(abs(data_out));
+hold on;
+plot(real(data_out), 'r');
+plot(imag(data_out), 'g');
+title('OFDM frame 1 before equalization');
+
+figure;
+plot(real(data_out), imag(data_out), '.');
+axis([-1 1 -1 1], "manual");
+title('OFDM frame 1 before equalization');
+
 data_out = data_out ./ transpose(H_ls)(7:end-5);
+
 figure;
 plot(abs(data_out));
 hold on;
