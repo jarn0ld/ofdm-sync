@@ -60,12 +60,13 @@ function [D, f, corr, power, frame_start, d_f, sig_out, sig_out_corr] = schmidl_
       plateau_count = 0;
     endif
     
-    if(plateau_count>((2*N)-10))
+    if(plateau_count>((3*N)))
       frame_start = plateau_index
-      d_phi = arg(corr(plateau_index+N))
-      d_w = d_phi/(N*(1/20e6))
-      d_f = d_w/(2*pi)
-      
+      d_phi = (arg(corr(plateau_index+90)));
+      d_w = d_phi/(N*(1/20e6));
+      d_f = d_w/(2*pi);#+7000;
+      d_phi
+      d_f
       sig_out = rec(frame_start:end);
       for k=1:length(sig_out)
         d_phi_curr = exp(-i*2*pi*d_f*k*(1/20e6));
