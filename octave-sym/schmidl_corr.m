@@ -62,7 +62,7 @@ function [D, f, corr, power, frame_start, d_f, sig_out, sig_out_corr] = schmidl_
     
     if(plateau_count>((3*N)))
       frame_start = plateau_index
-      d_phi = (arg(corr(plateau_index+90)));
+      d_phi = (arg(corr(plateau_index+80)));
       d_w = d_phi/(N*(1/20e6));
       d_f = d_w/(2*pi);#+7000;
       d_phi
