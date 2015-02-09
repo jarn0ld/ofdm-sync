@@ -22,11 +22,20 @@
 ## Author: Julian Arnold <julian@juarnold-t440>
 ## Created: 2015-02-06
 
-function [S_out, phi_new, phi_error] = derotate_ofdm_symbol (S, S_pilots, phi_old, polarity)
+## Pilots are 1 1 1 -1 modulated by the polarity bit
+
+function [S_out, phi_total_new, phi_error_avg] = derotate_ofdm_symbol (S, S_pilots, phi_old, polarity)
   S = S .* exp(-j*(phi_old));
   S_pilots = S_pilots .* exp(-j*(phi_old));
-  Phi_error = arg(S_pilots(1));
-  phi_error = mean(Phi_error);
-  S_out = S .* exp(-j*(phi_error));
-  phi_new = phi_error + phi_old;
+  Phi_error = [arg(S_pilots(1)*polarity) arg(S_pilots(2)*polarity) arg(S_pilots(3)*polarity) arg(-1*(S_pilots(4)*polarity))];
+  phi_error_diff = (arg(S_pilots(2)*polarity) - arg(S_pilots(1)*polarity)) / 14
+  phi_error_avg = mean(Phi_error)
+
+  S_out = S .* exp(-j.*(phi_error_avg));
+  
+  #for ii = 1:length(S)
+  #  S_out(ii) = S(ii) .* exp(-j*(phi_error_diff)*(ii-1));
+  #endfor
+  
+  phi_total_new = phi_error_avg + phi_old;
 endfunction
