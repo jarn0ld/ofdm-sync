@@ -97,33 +97,43 @@ curr_ofdm_sym_start_index = 129;
 phi = 0;
 phi_log = [];
 pilot_zero = [];
-polarity_seq = [1 1 1 1 -1 -1 -1 1 -1 -1 -1 -1 1 1 -1 1 -1 -1 1 1 -1 1]
-for ii = 1:100
+
+polarity_seq = [1 1 1 1 -1 -1 -1 1 -1 -1 -1 -1 1 1 -1 1 -1 -1 1 1 -1 1 1 -1 1 1 1 1 1 1 -1 1 1 1 -1 1 1 -1 -1 1 1 1 -1 1 -1 -1 -1 1 -1 1 -1 -1 1 -1 -1 1 1 1 1 1 -1 -1 1 1 -1 -1 1 -1 1 -1 1 1 -1 -1 -1 1 1 -1 -1 -1 -1 1 -1 -1 1 -1 1 1 1 1 -1 1 -1 1 -1 1 -1 -1 -1 -1 -1 1 -1 1 1 -1 1 -1 1 1 1 -1 -1 1 -1 -1 -1 1 1 1 -1 -1 -1 -1 -1 -1 -1];
+
+for ii = 1:90
 
   curr_ofdm_sym = sig_out_corr(curr_ofdm_sym_start_index:curr_ofdm_sym_start_index+63+16);
   curr_ofdm_sym = remove_cp(curr_ofdm_sym);
   [curr_ofdm_sym curr_ofdm_pilots] = decode_ofdm_symbol(curr_ofdm_sym, H_ls);
   pilot_zero = [pilot_zero curr_ofdm_pilots(1)];
-  [curr_ofdm_sym, phi, phi_curr] = derotate_ofdm_symbol(curr_ofdm_sym, curr_ofdm_pilots, phi);
+  [curr_ofdm_sym, phi, phi_curr] = derotate_ofdm_symbol(curr_ofdm_sym, curr_ofdm_pilots, phi, polarity_seq(ii));
   phi_log = [phi_log phi_curr];
    
   curr_ofdm_sym_start_index = curr_ofdm_sym_start_index+16+64;
 
   ############## DEBUG PLOTS ##############################
-  plot(real(curr_ofdm_sym), imag(curr_ofdm_sym), '.');
+  plot(real(curr_ofdm_pilots), imag(curr_ofdm_pilots), "marker", 'x', 'color', 'r');
+  hold on;
+  plot(real(curr_ofdm_sym), imag(curr_ofdm_sym), '+', 'color', 'b');
   axis([-2 2 -2 2], "manual");
+  #plot(arg(curr_ofdm_sym));
   title('OFDM Symbol after equalization');
+  grid on;
   drawnow;
+  
   #figure;
   #plot(real(curr_ofdm_pilots), imag(curr_ofdm_pilots), '.');
   #axis([-2 2 -2 2], "manual");
   #title('OFDM Pilots after equalization');
   #drawnow;
-  pause(0.1);
+  pause(1);
   ##########################################################
 endfor
-figure;
-plot(phi_log./(2*pi));
-figure;
-plot(arg(pilot_zero)./(2*pi));
+#figure;
+#plot(phi_log./(2*pi));
+#title('Phi/2pi');
+#mean(phi_log./(2*pi))
+#figure;
+#plot(arg(pilot_zero)./(2*pi));
+#title('Pilot Zero Phase Data');
 endif
