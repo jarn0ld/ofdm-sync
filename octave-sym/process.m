@@ -3,7 +3,8 @@ clear all;
 clc;
 
 r = read_complex_binary('samples.dat');
-r = r(9.404e6:9.414e6);
+#r = r(9.404e6:9.414e6);
+r = r(7.315e6:7.325e6);
 
 #figure;
 #plot(abs(r));
@@ -100,24 +101,23 @@ pilot_zero = [];
 
 polarity_seq = [1 1 1 1 -1 -1 -1 1 -1 -1 -1 -1 1 1 -1 1 -1 -1 1 1 -1 1 1 -1 1 1 1 1 1 1 -1 1 1 1 -1 1 1 -1 -1 1 1 1 -1 1 -1 -1 -1 1 -1 1 -1 -1 1 -1 -1 1 1 1 1 1 -1 -1 1 1 -1 -1 1 -1 1 -1 1 1 -1 -1 -1 1 1 -1 -1 -1 -1 1 -1 -1 1 -1 1 1 1 1 -1 1 -1 1 -1 1 -1 -1 -1 -1 -1 1 -1 1 1 -1 1 -1 1 1 1 -1 -1 1 -1 -1 -1 1 1 1 -1 -1 -1 -1 -1 -1 -1];
 
-for ii = 1:90
+for ii = 1:80
 
   curr_ofdm_sym = sig_out_corr(curr_ofdm_sym_start_index:curr_ofdm_sym_start_index+63+16);
   curr_ofdm_sym = remove_cp(curr_ofdm_sym);
   [curr_ofdm_sym curr_ofdm_pilots] = decode_ofdm_symbol(curr_ofdm_sym, H_ls);
   pilot_zero = [pilot_zero curr_ofdm_pilots(1)];
-  [curr_ofdm_sym, phi, phi_curr] = derotate_ofdm_symbol(curr_ofdm_sym, curr_ofdm_pilots, phi, polarity_seq(ii));
-  phi_log = [phi_log phi_curr];
-   
+  curr_ofdm_sym = derotate_ofdm_symbol(curr_ofdm_sym, curr_ofdm_pilots, polarity_seq(ii));
   curr_ofdm_sym_start_index = curr_ofdm_sym_start_index+16+64;
 
   ############## DEBUG PLOTS ##############################
-  plot(real(curr_ofdm_pilots), imag(curr_ofdm_pilots), "marker", 'x', 'color', 'r');
+  plot(real(curr_ofdm_pilots), imag(curr_ofdm_pilots), 'x', 'color', 'r');
   hold on;
-  plot(real(curr_ofdm_sym), imag(curr_ofdm_sym), '+', 'color', 'b');
+  plot(real(curr_ofdm_sym), imag(curr_ofdm_sym), 'o', 'color', 'b');
   axis([-2 2 -2 2], "manual");
   #plot(arg(curr_ofdm_sym));
-  title('OFDM Symbol after equalization');
+  title('OFDM Symbols After Equalization and BB Derotation');
+  legend("Pilot Symbols", "Derotated Data Symbols");
   grid on;
   drawnow;
   
@@ -126,7 +126,7 @@ for ii = 1:90
   #axis([-2 2 -2 2], "manual");
   #title('OFDM Pilots after equalization');
   #drawnow;
-  pause(1);
+  pause(0.1);
   ##########################################################
 endfor
 #figure;
