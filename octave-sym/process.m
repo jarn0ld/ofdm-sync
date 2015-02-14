@@ -6,58 +6,63 @@ r = read_complex_binary('samples.dat');
 #r = r(9.404e6:9.414e6);
 r = r(7.315e6:7.325e6);
 
-#figure;
-#plot(abs(r));
-#hold on;
+figure;
+plot(abs(r));
 
-#########################################
-##### Run Sync ##########################
-#########################################
+#############################################################
+#### Run
+#############################################################
 
 if(1)
-
+#### returns frequency corrected input starting at the beginning edge of the plateau.
 [D, f, corr, power, frame_start, d_f, sig_out, sig_out_corr] = schmidl_corr(r, 32);
-#figure;
-#hold on;
-#grid on;
-#plot(D,'r');
-#plot(f,'g');
-#title('Schmidl Cox out');
+figure;
+hold on;
+grid on;
+plot(D,'r');
+plot(f,'g');
+plot(abs(sig_out_corr), 'b');
+
+title('Schmidl Cox out');
 
 long_preamble_f = [1 1 -1 -1 1 1 -1 1 -1 1 1 1 1 1 1 -1 -1 1 1 -1 1 -1 1 1 1 1 0 1 -1 -1 1 1 -1 1 -1 1 -1 -1 -1 -1 -1 1 1 -1 -1 1 -1 1 -1 1 1 1 1];
+long_preamble_start = 0;
 
 ##############################################################
-######### Find Correlation with long preamble ################
+#### Fine timing by finding correlation with long preamble 
 ##############################################################
+if(0)
 ifft_data = [long_preamble_f(27:end) 0 0 0 0 0 0 0 0 0 0 0 long_preamble_f(1:26)];
 long_preamble_t = ifft(ifft_data);
 correlation = conv(conj(sig_out_corr), fliplr(long_preamble_t));
 [max, long_preamble_start] = max(abs(correlation));
 long_preamble_start
+endif
 ###############################################################
 
 ###############################################################
-########## Run FFT on LP ######################################
+#### 160 Samples SP + 32 Samples LP CP.
+#### Step a few samples back to make sure to be in CP LP1 and not in the crossover between LP1 and LP2.
+#### The channel equalizer in conjuntion with the pilots will handle the introduced frequency offset (in the F domain) for us.
 ###############################################################
-sig_out_corr = sig_out_corr(long_preamble_start-63:end);
-
-fft_input = sig_out_corr(1:64);
-fft_out = fft(fft_input);
-fft_out = fftshift(fft_out);
-fft_out = circshift(fft_out, [0 0]);
+sig_out_corr = sig_out_corr(160+32-5:end);
 ###############################################################
 
 ###############################################################
 ###################### Run channel equalizer ##################
 ###############################################################
+fft_input = sig_out_corr(1:64);
+fft_out = fft(fft_input);
+fft_out = fftshift(fft_out);
+fft_out = circshift(fft_out, [0 0]);
 data_out = fft_out(7:end-5);
 H_ls = inv(diag(circshift([0 0 0 0 0 0 long_preamble_f 0 0 0 0 0], [0 0])))*transpose([0 0 0 0 0 0 data_out 0 0 0 0 0]);
 
-#figure;
-#hold on;
-#plot(abs(H_ls));
-#plot(arg(H_ls), 'r');
-#title('Channel response H(f)');
+figure;
+hold on;
+plot(abs(H_ls));
+plot(arg(H_ls), 'r');
+title('Channel response H(f)');
 
 #figure;
 #plot(abs(data_out));
@@ -89,9 +94,10 @@ data_out = data_out ./ transpose(H_ls)(7:end-5);
 ###########################################################
 ################ Decode, baby! ############################
 ###########################################################
-### Pilots can be found in bins -21, -7, 7, 21
-### For the SYMBOL symbol their values are 1, 1, 1, -1
-close all;
+#### Pilots can be found in bins -21, -7, 7, 21
+#### For the SYMBOL symbol their values are 1, 1, 1, -1
+###########################################################
+#close all;
 fig = figure;
 
 curr_ofdm_sym_start_index = 129;
@@ -111,9 +117,9 @@ for ii = 1:80
   curr_ofdm_sym_start_index = curr_ofdm_sym_start_index+16+64;
 
   ############## DEBUG PLOTS ##############################
-  plot(real(curr_ofdm_pilots), imag(curr_ofdm_pilots), 'x', 'color', 'r');
+  plot(real(curr_ofdm_pilots), imag(curr_ofdm_pilots), 'marker', 'x', 'color', 'r');
   hold on;
-  plot(real(curr_ofdm_sym), imag(curr_ofdm_sym), 'o', 'color', 'b');
+  plot(real(curr_ofdm_sym), imag(curr_ofdm_sym), '.', 'color', 'b');
   axis([-2 2 -2 2], "manual");
   #plot(arg(curr_ofdm_sym));
   title('OFDM Symbols After Equalization and BB Derotation');
