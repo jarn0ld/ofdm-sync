@@ -44,6 +44,10 @@ endif
 #### 160 Samples SP + 32 Samples LP CP.
 #### Step a few samples back to make sure to be in CP LP1 and not in the crossover between LP1 and LP2.
 #### The channel equalizer in conjuntion with the pilots will handle the introduced frequency offset (in the F domain) for us.
+#### The channel equalizer can remove the f offset introduced by the timing offset completely. However,
+#### due to residual f offset in t domain, which also results amongst others in f offset in F domain, the initial phase of every OFDM symbol is 
+#### linearly increasing or decreasing. That results in constant rotation of the constellation between OFDM symbols. Therefore, we need to use the 
+#### pilot symbols to derotate. That is why timing sync does not affect the speed of rotation observed for the pilot constellations.
 ###############################################################
 sig_out_corr = sig_out_corr(160+32-5:end);
 ###############################################################
@@ -107,7 +111,7 @@ pilot_zero = [];
 
 polarity_seq = [1 1 1 1 -1 -1 -1 1 -1 -1 -1 -1 1 1 -1 1 -1 -1 1 1 -1 1 1 -1 1 1 1 1 1 1 -1 1 1 1 -1 1 1 -1 -1 1 1 1 -1 1 -1 -1 -1 1 -1 1 -1 -1 1 -1 -1 1 1 1 1 1 -1 -1 1 1 -1 -1 1 -1 1 -1 1 1 -1 -1 -1 1 1 -1 -1 -1 -1 1 -1 -1 1 -1 1 1 1 1 -1 1 -1 1 -1 1 -1 -1 -1 -1 -1 1 -1 1 1 -1 1 -1 1 1 1 -1 -1 1 -1 -1 -1 1 1 1 -1 -1 -1 -1 -1 -1 -1];
 
-for ii = 1:80
+for ii = 1:10
 
   curr_ofdm_sym = sig_out_corr(curr_ofdm_sym_start_index:curr_ofdm_sym_start_index+63+16);
   curr_ofdm_sym = remove_cp(curr_ofdm_sym);
