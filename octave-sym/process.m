@@ -75,10 +75,10 @@ title('Channel response H(f)');
 #plot(imag(data_out), 'g');
 #title('OFDM frame 1 before equalization');
 
-#figure;
-#plot(real(data_out), imag(data_out), '.');
-#axis([-1 1 -1 1], "manual");
-#title('OFDM frame 1 before equalization');
+figure;
+plot(real(data_out), imag(data_out), '.');
+axis([-1 1 -1 1], "manual");
+title('OFDM frame 1 before equalization');
 
 data_out = data_out ./ transpose(H_ls)(7:end-5);
 
@@ -115,6 +115,7 @@ for ii = 1:10
 
   curr_ofdm_sym = sig_out_corr(curr_ofdm_sym_start_index:curr_ofdm_sym_start_index+63+16);
   curr_ofdm_sym = remove_cp(curr_ofdm_sym);
+  curr_ofdm_wo_eq = curr_ofdm_sym;
   [curr_ofdm_sym curr_ofdm_pilots] = decode_ofdm_symbol(curr_ofdm_sym, H_ls);
   pilot_zero = [pilot_zero curr_ofdm_pilots(1)];
   curr_ofdm_sym = derotate_ofdm_symbol(curr_ofdm_sym, curr_ofdm_pilots, polarity_seq(ii));
@@ -123,7 +124,7 @@ for ii = 1:10
   ############## DEBUG PLOTS ##############################
   plot(real(curr_ofdm_pilots), imag(curr_ofdm_pilots), 'marker', 'x', 'color', 'r');
   hold on;
-  plot(real(curr_ofdm_sym), imag(curr_ofdm_sym), '.', 'color', 'b');
+  plot(real(curr_ofdm_wo_eq), imag(curr_ofdm_wo_eq), '.', 'color', 'b');
   axis([-2 2 -2 2], "manual");
   #plot(arg(curr_ofdm_sym));
   title('OFDM Symbols After Equalization and BB Derotation');
