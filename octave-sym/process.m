@@ -54,13 +54,14 @@ sig_out_corr = sig_out_corr(160+32-5:end);
 ###################### Run channel equalizer ##################
 ###############################################################
 fft_input = sig_out_corr(1:64);
+#fft_input = sig_out(1:64);
 fft_out = fft(fft_input);
 fft_out = fftshift(fft_out);
 fft_out = circshift(fft_out, [0 0]);
 data_out = fft_out(7:end-5);
 
 H_ls = inv(diag(circshift([0 0 0 0 0 0 long_preamble_f 0 0 0 0 0], [0 0])))*transpose([0 0 0 0 0 0 data_out 0 0 0 0 0]);
-
+H_ls
 figure;
 hold on;
 plot(abs(H_ls));

@@ -34,7 +34,7 @@ fft_out = fft_out ./ transpose(H);
 #########################################################
 
 fft_out = fft_out(7:end-5); # remove guard carriers
-S_ofdm = [fft_out(1:5) fft_out(7:19) fft_out(21:33) fft_out(35:47) fft_out(49:end)];
+S_ofdm = [fft_out(1:5) fft_out(7:19) fft_out(21:26) fft_out(28:33) fft_out(35:47) fft_out(49:end)];
 S_pilots = [fft_out(6) fft_out(20) fft_out(34) fft_out(48)];
 
 if(debug == 1)
